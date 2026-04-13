@@ -20,7 +20,7 @@ import { DeleteItemButton } from './DeleteItemButton'
 import { EditItemQuantityButton } from './EditItemQuantityButton'
 import { OpenCartButton } from './OpenCart'
 import { Button } from '@/components/ui/button'
-import { Product } from '@/payload-types'
+import { Media, Product, Variant, VariantOption } from '@/payload-types'
 
 export function CartModal() {
   const { cart } = useCart()
@@ -85,14 +85,14 @@ export function CartModal() {
                   if (isVariant) {
                     price = variant?.priceInUSD
 
-                    const imageVariant = product.gallery?.find((item) => {
+                    const imageVariant = product.gallery?.find((item: { image: number | Media; variantOption?: (number | null) | VariantOption; id?: string | null }) => {
                       if (!item.variantOption) return false
                       const variantOptionID =
                         typeof item.variantOption === 'object'
                           ? item.variantOption.id
                           : item.variantOption
 
-                      const hasMatch = variant?.options?.some((option) => {
+                      const hasMatch = (variant as Variant)?.options?.some((option: number | VariantOption) => {
                         if (typeof option === 'object') return option.id === variantOptionID
                         else return option === variantOptionID
                       })
@@ -131,8 +131,8 @@ export function CartModal() {
                             <span className="leading-tight">{product?.title}</span>
                             {isVariant && variant ? (
                               <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
-                                {variant.options
-                                  ?.map((option) => {
+                                {(variant as Variant).options
+                                  ?.map((option: number | VariantOption) => {
                                     if (typeof option === 'object') return option.label
                                     return null
                                   })
