@@ -29,6 +29,7 @@ export default async function ShopPage({ searchParams }: Props) {
 
   const products = await payload.find({
     collection: 'products',
+    locale,
     draft: false,
     overrideAccess: false,
     select: {
