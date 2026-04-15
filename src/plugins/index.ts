@@ -134,6 +134,26 @@ export const plugins: Plugin[] = [
     },
     products: {
       productsCollectionOverride: ProductsCollection,
+      variants: {
+        variantsCollectionOverride: ({ defaultCollection }) => ({
+          ...defaultCollection,
+          fields: [
+            ...defaultCollection.fields,
+            {
+              name: 'priceInILS',
+              type: 'number',
+              label: 'Price in ILS (₪)',
+              admin: { step: 1 },
+            },
+            {
+              name: 'priceInILSEnabled',
+              type: 'checkbox',
+              defaultValue: true,
+              admin: { hidden: true },
+            },
+          ],
+        }),
+      },
     },
   }),
 ]

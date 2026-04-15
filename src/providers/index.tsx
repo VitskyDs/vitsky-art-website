@@ -17,6 +17,13 @@ export const Providers: React.FC<{
           <SonnerProvider />
           <EcommerceProvider
             enableVariants={true}
+            currenciesConfig={{
+              defaultCurrency: 'ILS',
+              supportedCurrencies: [
+                { code: 'ILS', symbol: '₪', label: 'Israeli Shekel', decimals: 0 },
+                { code: 'USD', symbol: '$', label: 'US Dollar', decimals: 2 },
+              ],
+            }}
             api={{
               cartsFetchQuery: {
                 depth: 2,

@@ -21,6 +21,7 @@ export const productTshirtData: (
   categories,
 }) => {
   return {
+    type: 'print',
     enableVariants: true,
     variantTypes: variantTypes,
     inventory: 0,
