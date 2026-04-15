@@ -1,5 +1,4 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { migrations } from './migrations'
 
 import {
   BoldFeature,
@@ -53,8 +52,6 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
       ssl: { rejectUnauthorized: false },
     },
-    // Only run migrations at runtime, not during `next build` (no stdin available there)
-    prodMigrations: process.env.NEXT_PHASE !== 'phase-production-build' ? migrations : undefined,
   }),
   editor: lexicalEditor({
     features: () => {
