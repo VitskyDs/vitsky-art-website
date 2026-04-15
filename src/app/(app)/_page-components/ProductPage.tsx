@@ -1,6 +1,5 @@
 import type { Media, Product } from '@/payload-types'
 
-import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { GridTileImage } from '@/components/Grid/tile'
 import { Gallery } from '@/components/product/Gallery'
 import { ProductDescription } from '@/components/product/ProductDescription'
@@ -130,8 +129,6 @@ export async function ProductPageContent({ slug, locale }: Props) {
           </div>
         </div>
       </div>
-
-      {product.layout?.length ? <RenderBlocks blocks={product.layout} /> : <></>}
 
       {relatedProducts.length ? (
         <div className="container">

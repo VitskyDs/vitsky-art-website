@@ -38,7 +38,6 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
             <MediumFilter
               title={t('shop.filterMedium', locale)}
               allLabel={t('shop.all', locale)}
-              locale={locale}
             />
             <FilterList list={sorting} title={t('shop.sortBy', locale)} />
           </div>

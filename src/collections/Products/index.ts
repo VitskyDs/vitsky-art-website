@@ -1,6 +1,3 @@
-import { CallToAction } from '@/blocks/CallToAction/config'
-import { Content } from '@/blocks/Content/config'
-import { MediaBlock } from '@/blocks/MediaBlock/config'
 import { slugField } from 'payload'
 import { generatePreviewPath } from '@/utilities/generatePreviewPath'
 import { CollectionOverride } from '@payloadcms/plugin-ecommerce/types'
@@ -65,6 +62,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       type: 'tabs',
       tabs: [
         {
+          label: 'תוכן',
           fields: [
             {
               name: 'description',
@@ -72,33 +70,27 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               localized: true,
               label: 'תיאור',
               editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                    HorizontalRuleFeature(),
-                  ]
-                },
+                features: ({ rootFeatures }) => [
+                  ...rootFeatures,
+                  HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                  FixedToolbarFeature(),
+                  InlineToolbarFeature(),
+                  HorizontalRuleFeature(),
+                ],
               }),
-              required: false,
             },
             {
               name: 'artistNotes',
               type: 'richText',
-              localized: true,
+              // Not localized — artist writes in Hebrew; English visitors get it via locale fallback
               label: 'הערות האמן',
               editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                  ]
-                },
+                features: ({ rootFeatures }) => [
+                  ...rootFeatures,
+                  FixedToolbarFeature(),
+                  InlineToolbarFeature(),
+                ],
               }),
-              required: false,
             },
             {
               name: 'gallery',
@@ -117,80 +109,43 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   type: 'relationship',
                   relationTo: 'variantOptions',
                   admin: {
-                    condition: (data) => {
-                      return data?.enableVariants === true && data?.variantTypes?.length > 0
-                    },
+                    condition: (data) =>
+                      data?.enableVariants === true && data?.variantTypes?.length > 0,
                   },
                   filterOptions: ({ data }) => {
                     if (data?.enableVariants && data?.variantTypes?.length) {
                       const variantTypeIDs = data.variantTypes.map((item: any) => {
-                        if (typeof item === 'object' && item?.id) {
-                          return item.id
-                        }
+                        if (typeof item === 'object' && item?.id) return item.id
                         return item
                       }) as DefaultDocumentIDType[]
 
-                      if (variantTypeIDs.length === 0)
-                        return {
-                          variantType: {
-                            in: [],
-                          },
-                        }
+                      if (variantTypeIDs.length === 0) return { variantType: { in: [] } }
 
-                      const query: Where = {
-                        variantType: {
-                          in: variantTypeIDs,
-                        },
-                      }
-
+                      const query: Where = { variantType: { in: variantTypeIDs } }
                       return query
                     }
-
-                    return {
-                      variantType: {
-                        in: [],
-                      },
-                    }
+                    return { variantType: { in: [] } }
                   },
                 },
               ],
             },
-
-            {
-              name: 'layout',
-              type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock],
-            },
           ],
-          label: 'Content',
         },
         {
+          label: 'פרטי מוצר',
           fields: [
             ...defaultCollection.fields,
             {
               name: 'relatedProducts',
               type: 'relationship',
               filterOptions: ({ id }) => {
-                if (id) {
-                  return {
-                    id: {
-                      not_in: [id],
-                    },
-                  }
-                }
-
-                // ID comes back as undefined during seeding so we need to handle that case
-                return {
-                  id: {
-                    exists: true,
-                  },
-                }
+                if (id) return { id: { not_in: [id] } }
+                return { id: { exists: true } }
               },
               hasMany: true,
               relationTo: 'products',
             },
           ],
-          label: 'Product Details',
         },
         {
           name: 'meta',
@@ -205,16 +160,10 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               hasGenerateFn: true,
               overrides: { localized: true },
             }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
+            MetaImageField({ relationTo: 'media' }),
             MetaDescriptionField({ overrides: { localized: true } }),
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),
@@ -232,9 +181,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
         { label: 'הדפס', value: 'print' },
         { label: 'מקור', value: 'original' },
       ],
-      admin: {
-        position: 'sidebar',
-      },
+      admin: { position: 'sidebar' },
     },
     {
       name: 'sku',
@@ -250,8 +197,8 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     {
       name: 'medium',
       type: 'text',
+      // Not localized — same art term in all languages (e.g. "oil on canvas" / "שמן על בד" entered once)
       label: 'מדיום',
-      localized: true,
       admin: {
         position: 'sidebar',
         placeholder: 'למשל: אקוורל, שמן על בד',
