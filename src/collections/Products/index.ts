@@ -24,7 +24,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
   ...defaultCollection,
   admin: {
     ...defaultCollection?.admin,
-    defaultColumns: ['title', 'enableVariants', '_status', 'variants.variants'],
+    defaultColumns: ['title', 'type', '_status', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -45,16 +45,22 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     ...defaultCollection?.defaultPopulate,
     title: true,
     slug: true,
+    type: true,
+    medium: true,
+    dimensions: true,
+    sold: true,
+    featured: true,
     variantOptions: true,
     variants: true,
     enableVariants: true,
     gallery: true,
     priceInUSD: true,
+    priceInILS: true,
     inventory: true,
     meta: true,
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    { name: 'title', type: 'text', required: true, localized: true, label: 'שם היצירה' },
     {
       type: 'tabs',
       tabs: [
@@ -63,6 +69,8 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             {
               name: 'description',
               type: 'richText',
+              localized: true,
+              label: 'תיאור',
               editor: lexicalEditor({
                 features: ({ rootFeatures }) => {
                   return [
@@ -74,12 +82,28 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   ]
                 },
               }),
-              label: false,
+              required: false,
+            },
+            {
+              name: 'artistNotes',
+              type: 'richText',
+              localized: true,
+              label: 'הערות האמן',
+              editor: lexicalEditor({
+                features: ({ rootFeatures }) => {
+                  return [
+                    ...rootFeatures,
+                    FixedToolbarFeature(),
+                    InlineToolbarFeature(),
+                  ]
+                },
+              }),
               required: false,
             },
             {
               name: 'gallery',
               type: 'array',
+              label: 'תמונות',
               minRows: 1,
               fields: [
                 {
@@ -179,12 +203,13 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             }),
             MetaTitleField({
               hasGenerateFn: true,
+              overrides: { localized: true },
             }),
             MetaImageField({
               relationTo: 'media',
             }),
 
-            MetaDescriptionField({}),
+            MetaDescriptionField({ overrides: { localized: true } }),
             PreviewField({
               // if the `generateUrl` function is configured
               hasGenerateFn: true,
@@ -198,8 +223,89 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
       ],
     },
     {
+      name: 'type',
+      type: 'select',
+      label: 'סוג',
+      required: true,
+      defaultValue: 'print',
+      options: [
+        { label: 'הדפס', value: 'print' },
+        { label: 'מקור', value: 'original' },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'sku',
+      type: 'text',
+      label: 'מק"ט (SKU)',
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'מזהה ייחודי למוצר, למשל: LL-001',
+      },
+    },
+    {
+      name: 'medium',
+      type: 'text',
+      label: 'מדיום',
+      localized: true,
+      admin: {
+        position: 'sidebar',
+        placeholder: 'למשל: אקוורל, שמן על בד',
+      },
+    },
+    {
+      name: 'dimensions',
+      type: 'text',
+      label: 'מידות',
+      admin: {
+        position: 'sidebar',
+        placeholder: 'למשל: 50×70 ס״מ',
+      },
+    },
+    {
+      name: 'sold',
+      type: 'checkbox',
+      label: 'נמכר',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        condition: (data) => data?.type === 'original',
+        description: 'סמן כנמכר עבור עבודות מקור',
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'מוצג בעמוד הבית',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'סמן כדי להציג עבודה זו בעמוד הבית',
+      },
+    },
+    {
+      name: 'priceInILS',
+      type: 'number',
+      label: 'מחיר ₪ (ILS)',
+      admin: {
+        position: 'sidebar',
+        step: 1,
+      },
+    },
+    {
+      name: 'priceInILSEnabled',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: { hidden: true },
+    },
+    {
       name: 'categories',
       type: 'relationship',
+      label: 'קטגוריות',
       admin: {
         position: 'sidebar',
         sortOptions: 'title',

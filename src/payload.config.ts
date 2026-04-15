@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { migrations } from './migrations'
 
 import {
   BoldFeature,
@@ -27,6 +28,14 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  localization: {
+    locales: [
+      { code: 'he', label: 'עברית', rtl: true },
+      { code: 'en', label: 'English', rtl: false },
+    ],
+    defaultLocale: 'he',
+    fallback: true,
+  },
   admin: {
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
@@ -44,6 +53,7 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
       ssl: { rejectUnauthorized: false },
     },
+    prodMigrations: migrations,
   }),
   editor: lexicalEditor({
     features: () => {
